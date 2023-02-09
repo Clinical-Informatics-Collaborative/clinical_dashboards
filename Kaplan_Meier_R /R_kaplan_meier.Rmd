@@ -18,7 +18,8 @@ library(plotly)
 library(ggsurvfit)
 ```
 
-# The first example is analysis the whether there is significant difference in two different drugs with conditions as cancer, the reading data is already extracted as the standard format used for survival analysis 
+# The first example is analysis the whether there is significant difference in two different drugs with conditions as cancer, the reading data is already extracted as the standard format used for survival analysis used for check the correctness of Kaplan Meier curve plot by Tableau
+
 
 ```{r}
 data = read.csv(file = 'preprocessed_data_Tableau/two_drug.csv')
@@ -86,8 +87,8 @@ get_kaplan_meier_plot2 <- function(data,time_unit){
 length(unique(data$group))
 data
 time_unit = 'Day'
-get_kaplan_meier_plot1(data,time_unit)
 get_kaplan_meier_plot2(data,time_unit)
+get_kaplan_meier_plot1(data,time_unit)
 ```
 
 
@@ -100,7 +101,7 @@ get_kaplan_meier_plot2(data,time_unit)
 
 data =  read.csv(file = 'preprocessed_data_Tableau/all_die_1_year.csv')
 names(data)[names(data) == 'DESCRIPTION'] <- 'group'
-get_kaplan_meier_plot1(data,duration_unit)
+get_kaplan_meier_plot1(data,time_unit)
 
 ```
 
@@ -108,26 +109,26 @@ get_kaplan_meier_plot1(data,duration_unit)
 ```{r}
 data =  read.csv(file = 'preprocessed_data_Tableau/all_alive.csv')
 names(data)[names(data) == 'DESCRIPTION'] <- 'group'
-get_kaplan_meier_plot1(data,duration_unit)
+get_kaplan_meier_plot1(data,time_unit)
 
 ```
 
 ```{r}
 data =  read.csv(file = 'preprocessed_data_Tableau/all_die_1_day.csv')
 names(data)[names(data) == 'DESCRIPTION'] <- 'group'
-get_kaplan_meier_plot1(data,duration_unit)
+get_kaplan_meier_plot1(data,time_unit)
 ```
 
 ```{r}
 data =  read.csv(file = 'preprocessed_data_Tableau/all_die_prop_time.csv')
 names(data)[names(data) == 'DESCRIPTION'] <- 'group'
-get_kaplan_meier_plot1(data,duration_unit)
+get_kaplan_meier_plot1(data,time_unit)
 ```
 
 ```{r}
 data =  read.csv(file = 'preprocessed_data_Tableau/two_condition.csv')
 names(data)[names(data) == 'DESCRIPTION'] <- 'group'
-get_kaplan_meier_plot1(data,duration_unit)
+get_kaplan_meier_plot1(data,time_unit)
 ```
 
 
