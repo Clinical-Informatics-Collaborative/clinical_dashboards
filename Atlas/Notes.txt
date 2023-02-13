@@ -1,0 +1,1149 @@
+Install Java and git:
+
+sudo apt-get update
+
+sudo apt-get install openjdk-8-jdk
+
+set Java home:
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64^C
+
+sudo add-apt-repository ppa:git-core/ppa
+
+sudo apt update
+
+sudo apt install git
+
+
+
+
+
+
+
+
+
+
+
+Install R:
+sudo apt update -qq
+
+sudo apt install --no-install-recommends software-properties-common dirmngr
+
+wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | sudo tee -a /etc/apt/trusted.gpg.d/cran_ubuntu_key.asc
+
+sudo add-apt-repository "deb https://cloud.r-project.org/bin/linux/ubuntu $(lsb_release -cs)-cran40/"
+
+sudo apt install --no-install-recommends r-base
+
+sudo add-apt-repository ppa:c2d4u.team/c2d4u4.0+
+
+
+
+
+
+
+
+
+
+
+
+Go to R studio site https://posit.co/download/rstudio-desktop/
+Dpwnload the RStudio Ubuntu version
+double click to install
+
+
+
+
+
+
+
+
+
+
+
+
+
+Open RStudio, install R essential packages
+Run following line one by one
+
+install.packages("devtools")
+
+If install failed, 
+Open system termianl, run following command to install depencides:
+sudo apt-get install libzmq3-dev libharfbuzz-dev libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev build-essential libcurl4-openssl-dev libxml2-dev libssl-dev libfontconfig1-dev
+
+install.packages("usethis")
+
+#Windows (Run in Rstudio)
+install.packages("rJava")
+#Linux UBuntu, Run in System command line
+apt-get install r-cran-rjava
+
+install.packages("DatabaseConnector")
+
+remotes::install_github("OHDSI/Achilles@*release")
+
+devtools::install_github("OHDSI/CommonDataModel")
+
+remotes::install_github("OHDSI/Achilles")
+
+
+
+
+
+
+
+
+
+
+Install Postgresql database and database management tool pgadmin
+
+Go to https://www.postgresql.org/download/linux/ubuntu/
+Open terminal and input the instructions, command line one by one, commands also shows below (Here version 10 specific)
+
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+sudo apt-get update
+sudo apt-get -y install postgresql-10
+
+Later, to start postgresql database, use command
+pg_ctlcluster 10 main start
+
+Install database management tool, run the following command one by one (https://www.pgadmin.org/download/pgadmin-4-apt/)
+
+sudo snap install curl
+
+curl -fsS https://www.pgadmin.org/static/packages_pgadmin_org.pub | sudo gpg --dearmor -o /usr/share/keyrings/packages-pgadmin-org.gpg
+
+sudo sh -c 'echo "deb [signed-by=/usr/share/keyrings/packages-pgadmin-org.gpg] https://ftp.postgresql.org/pub/pgadmin/pgadmin4/apt/$(lsb_release -cs) pgadmin4 main" > /etc/apt/sources.list.d/pgadmin4.list && apt update'
+
+sudo apt install pgadmin4
+
+sudo /usr/pgadmin4/bin/setup-web.sh
+
+
+
+
+
+
+
+
+
+
+
+Initiize pgAdmin application
+
+Open pgAdmin4 app
+
+Set the main password as "ohdsi"
+
+close pgAdmin4 app
+
+Now, open termianl and enter following commands line by line to change postregsql default password (username is postgres)
+
+sudo su postgres
+
+psql
+
+\password postgres
+
+# enter your password twice
+
+After doing this, Open pgAdmin4 app again.
+
+Right click Servers -> Register -> Server
+
+In General tab, set Name: postgres
+In Connection tab, set Hostname/address as your host IP address (localhost can be localhost), "Maintenance Database" and "Username" are both 'postgres', "password" input the password you have just entered in the last step.
+Click OK, you should find the postgres database created successfully
+
+
+
+
+
+
+
+
+
+
+
+Create Database and Database Users, roles
+
+Database Group Roles
+
+1. Group: ohdsi_admin
+In pgAmdin4 app, find postgres, right click, select create -> login/Group Role
+In General tab, Set name: ohdsi_admin, and set Comment: Administration group for OHDSI applications
+In Privileges tab, check items: 1. Create databases,    2. Inherit rights from the parent roles,     3. Can initiate streaming replication and backups
+Save
+
+2. Group: ohdsi_app
+In pgAmdin4 app, find postgres, right click, select create -> login/Group Role
+In General tab, Set name: ohdsi_app, and set Comment: Application group for OHDSI applications
+In Privileges tab, check items: 1. Inherit rights from the parent roles
+Save
+
+
+
+Database Login Roles
+
+1. Login: ohdsi_admin_user
+In pgAmdin4 app, find postgres, right click, select create -> login/Group Role
+In General tab, Set name: ohdsi_admin_user, and set Comment: Admin user account for OHDSI applications
+In Definition tab, Set your password (in this note, we set "admin1")
+In Privileges tab, check items: 1.Inherit rights from the parent roles,   2. can log in
+In Membership tab, add Member of to "ohdsi_admin".
+
+2. Login: ohdsi_app_user
+In pgAmdin4 app, find postgres, right click, select create -> login/Group Role
+In General tab, Set name: ohdsi_app_user, and set Comment: Application user account for OHDSI applications
+In Definition tab, Set your password (in this note, we set "app1")
+In Privileges tab, check items: 1.Inherit rights from the parent roles,   2. can log in
+In Membership tab, add Member of to "ohdsi_app".
+
+
+
+
+
+
+
+
+
+
+
+
+
+Create the OHDSI WebAPI database
+
+Open pgAdmin4 app, open postgres, right click "Database", select "Create" -> Database
+In General tab, Set Name: OHDSI, Owner: ohdsi_admin, Comment: OHDSI WebAPI database
+In Security tab, find privileges, add ohdsi_admin, set privileges as "all"; add ohdsi_app, set privileges as "TEMPORARY" and "Connect"
+
+
+
+
+
+
+
+
+
+
+
+Prepare Database Schema for WebAPI
+Open pgAdmin4 app, right click Server, select "Register" -> "Server", This account will be used to create the database to host the WebAPI schema and table.
+In General tab, set Name as your prefernece, in this note, we will use name "localhost - ohdsi_admin_user"
+In Connection tab, set your host address (localhost is localhost), Maintenance DB is postgres, Username is ohdsi_admin_user and password is your set password ("admin1" here)
+Save and created
+
+Open localhost-ohdsi_admin_user, select Database -> OHDSI -> Schemas.
+Right click "Schemas" -> Create -> Schema
+In General tab, Set name: webapi, Owner: ohdsi_admin, and set Comment: Schema containing tables to support WebAPI functionality
+In Security tab, find Privileges, add "PUBLIC", set Privileges as "USAGE"   ;   add "ohdsi_admin", set Privileges as "ALL"   ;   add "ohdsi_app", set Privileges as "USAGE" 
+Save 
+
+Once webapi schema created, right click webapi and select Properties
+In Default privileges tab, select Table tab, Add group "ohdsi_app" with INSERT, SELECT, UPDATE, DELETE, REFERENCES and TRIGGER
+In Default privileges tab, select Sequence tab, Add group ohdsi_app with SELECT and USAGE
+In Default privileges tab, select Functions tab, Add group ohdsi_app with EXECUTE
+In Default privileges tab, select Type tab, Add group ohdsi_app with USAGE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Switch back to JDK1.8 and set JAVA HOME
+
+Until now, the JAVA has been changed to java11, to switch to Java 1.8, open terminal and input
+
+sudo update-alternatives --config java
+
+choose the JDK1.8 number, then use command
+
+java -version
+
+to check the java version
+
+Enter the following command to set JAVA HOME
+
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+
+then use command
+
+echo $JAVA_HOME
+
+to check JAVA HOME valid
+
+
+
+
+
+
+
+
+
+
+Install Maven
+
+Go to https://maven.apache.org/download.cgi to download the latest maven, here version is 3.8.7
+RUn the following commands one by one
+
+sudo apt update
+
+sudo apt install maven
+-------------------------------
+check maven version, run
+
+mvn -version
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+How to install Tomcat on Ubuntu
+
+[Source: https://www.digitalocean.com/community/tutorials/how-to-install-apache-tomcat-8-on-ubuntu-16-04]
+
+
+Go to website https://dlcdn.apache.org/tomcat/tomcat-8/v8.5.84/bin/
+
+Download apache-tomcat-8.5.84.tar.gz
+
+
+Run the following commands
+
+Create a tomcat user:
+
+sudo groupadd tomcat
+
+sudo useradd -s /bin/false -g tomcat -d /opt/tomcat tomcat
+
+
+
+
+Download and install Tomcat:
+
+sudo mkdir /opt/tomcat
+
+Go to the apache-tomcat-8.5.84.tar.gz path, open terminal, following the commands
+
+sudo tar xzvf apache-tomcat-8.5.84.tar.gz -C /opt/tomcat --strip-components=1
+
+
+
+
+Update Permissions:
+
+cd /opt/tomcat
+
+sudo chgrp -R tomcat /opt/tomcat
+
+sudo chmod -R g+r conf
+
+sudo chmod g+x conf
+
+sudo chown -R tomcat webapps/ work/ temp/ logs/
+
+
+
+
+
+Create a systemd Service File:
+
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+
+Enter
+sudo nano /etc/systemd/system/tomcat.service
+
+open text file, paste the following content: [Environment=JAVA_HOME=] may vary by your OS
+-----------------------------------------------------------------------------------------------
+[Unit]
+Description=Apache Tomcat Web Application Container
+After=network.target
+
+[Service]
+Type=forking
+
+Environment=JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre
+Environment=CATALINA_PID=/opt/tomcat/temp/tomcat.pid
+Environment=CATALINA_HOME=/opt/tomcat
+Environment=CATALINA_BASE=/opt/tomcat
+Environment='CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC'
+Environment='JAVA_OPTS=-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom'
+
+ExecStart=/opt/tomcat/bin/startup.sh
+ExecStop=/opt/tomcat/bin/shutdown.sh
+
+User=tomcat
+Group=tomcat
+UMask=0007
+RestartSec=10
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+-------------------------------------------------------------------------------------------------
+
+sudo systemctl daemon-reload
+
+# Start Tomcat
+sudo systemctl start tomcat
+
+# Stop Tomcat (Not need to run here)
+sudo systemctl stop tomcat
+
+#Check Tomcat status
+sudo systemctl status tomcat
+
+
+
+
+
+
+
+Adjust the Firewall and Test the Tomcat Server, run the following commands:
+
+sudo ufw allow 8080
+
+Open in browser:
+http://127.0.0.1:8080
+Check whether works
+
+sudo systemctl enable tomcat
+
+
+
+
+
+
+
+
+Configure Tomcat Web Management Interface
+
+sudo nano /opt/tomcat/conf/tomcat-users.xml
+
+Change the following part
+-------------------------------------------------------------------------------------
+<!--
+  <role rolename="tomcat"/>
+  <role rolename="role1"/>
+  <user username="tomcat" password="<must-be-changed>" roles="tomcat"/>
+  <user username="both" password="<must-be-changed>" roles="tomcat,role1"/>
+  <user username="role1" password="<must-be-changed>" roles="role1"/>
+-->
+-------------------------------------------------------------------------------------
+
+to the following part
+
+-------------------------------------------------------------------------------------
+<role rolename="manager-gui"/>
+  <user username="tomcat" password="s3cret" roles="manager-gui"/>
+-------------------------------------------------------------------------------------
+
+
+
+##### Optional
+To remove local IP access restrictions, please enter command
+
+sudo nano /opt/tomcat/webapps/manager/META-INF/context.xml   (for Manager app)
+
+and
+
+sudo nano /opt/tomcat/webapps/host-manager/META-INF/context.xml   (For host manager app)
+
+to manmage IP restrications. comment the IP restriction part as following
+-------------------------------------------------------------------------------------
+<Context antiResourceLocking="false" privileged="true" >
+  <!--<Valve className="org.apache.catalina.valves.RemoteAddrValve"
+         allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" />-->
+</Context>
+-------------------------------------------------------------------------------------
+
+
+
+
+Open in browser:
+http://127.0.0.1:8080/manager
+Check whether works
+
+
+
+Until now, the TomCat has been deployed completed on Ubuntu.
+
+
+
+
+
+
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+If any step failed and uncoverable, needs to restart to install Tomcat.
+
+Close all terminals, and then open a new termianl, run command line by line:
+
+sudo systemctl stop tomcat
+cd /opt
+sudo rm -rf tomcat
+
+After doing these, you can restart the Tomcat process
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Check Database connectivity
+
+Go to https://jdbc.postgresql.org/download/
+Download Java8 JDBC driver
+
+Go to https://www.sql-workbench.eu/download-archive.html
+
+Download the Build 127 (requires Java 8), select all platforms
+
+Go to download path, extract the file Workbench-Build127.zip
+
+Then enter the extract folder, open terminal run the following commands to open the sqlbench
+
+java -jar sqlworkbench.jar
+
+With the SQL WorkbenchJ opened, in the "Select COnnection Profile" page, 
+Select Driver as "PostgreSQL" (org.postgresql.Driver), another box will jump out asked "edit the driver definition now", select yes
+
+Then in the new dialogue box, click the library box right first button, to choose the the driver file (Java8 JDBC driver) just downloaded
+
+Then change the Sample URL to "jdbc:postgresql://yourDatabaseIPAddress:PortNumber/DatabaseName", in this note, we were using "jdbc:postgresql://127.0.0.1:5432/OHDSI"
+
+Then click OK
+
+beack to last box, set the Username as "ohdsi_admin_user" and password as your password (in this note is "admin1")
+
+Then click "OK" to connect, if previous steps are all correct, the connection will be successful without any error, this means the database OHDSI can be accessed successfully
+
+
+
+
+
+
+
+
+
+Building WebAPI
+
+Open terminal, run command line by line
+
+git clone https://github.com/OHDSI/WebAPI.git
+
+cd WebAPI
+
+git checkout refs/tags/v2.10.1
+
+# Create a config file 
+
+mkdir WebAPIConfig
+
+cp sample_settings.xml ~/WebAPI/WebAPIConfig/
+
+cd WebAPIConfig
+
+mv sample_settings.xml settings.xml
+
+
+# Next modify config file
+
+Open settings.xml in WebAPIConfig folder
+
+change 
+<datasource.url>jdbc:postgresql://localhost:5432/OHDSI</datasource.url>
+to 
+<datasource.url>jdbc:postgresql://127.0.0.1:5432/OHDSI</datasource.url>
+
+change 
+<datasource.username>ohdsi_app_user</datasource.username>
+<datasource.password>app1</datasource.password>
+to
+<datasource.username>ohdsi_app_user</datasource.username>
+<datasource.password>app1</datasource.password>
+
+Change
+<flyway.datasource.username>ohdsi_admin_user</flyway.datasource.username>
+<flyway.datasource.password>!PASSWORD!</flyway.datasource.password>
+to
+<flyway.datasource.username>ohdsi_admin_user</flyway.datasource.username>
+<flyway.datasource.password>admin</flyway.datasource.password>
+
+Leave
+<security.origin>*</security.origin>
+as original
+
+Build the WebAPI, run the following command
+
+cd
+
+cd WebAPI
+
+mvn clean package -DskipUnitTests -DskipITtests -s WebAPIConfig/settings.xml -P webapi-postgresql
+
+----------------
+
+After built successful, go to WebAPI/target folder, and check the size of file WebAPI.war in megaBytes and upfloor a hundred unit
+
+For example, 172.2 MB --> Up Floor --> 200MB
+
+Go to https://www.gbmb.org/mb-to-bytes
+
+check the Bytes, input the mb value, and get the bytes value
+
+For example 200 MB -> 209715200 Bytes
+
+Record your Bytes value
+
+
+next, we need to modify the Tomcat WebAPI deployment tool limits
+
+open termianl, run command
+
+sudo nano /opt/tomcat/webapps/manager/WEB-INF/web.xml
+
+FInd the following part
+-------------------------------------------
+    <multipart-config>
+      <!-- 50MB max -->
+      <max-file-size>52428800</max-file-size>
+      <max-request-size>52428800</max-request-size>
+      <file-size-threshold>0</file-size-threshold>
+    </multipart-config>
+-------------------------------------------
+
+Replace the
+
+<max-file-size>52428800</max-file-size>
+<max-request-size>52428800</max-request-size>
+
+
+to (your bytes, here example is 209715200)
+
+<max-file-size>209715200</max-file-size>
+<max-request-size>209715200</max-request-size>
+
+Save and exit
+
+
+Restart/or start Tomcat to make it valid, run command
+
+sudo systemctl restart tomcat
+sudo systemctl start tomcat
+
+Stop tomcat
+sudo systemctl start tomcat
+
+
+
+
+
+
+
+
+
+
+Deploy WebAPI:
+
+Open termianl, run command
+
+sudo su
+
+sudo sh /opt/tomcat/bin/catalina.sh run > /opt/tomcat/logs/webapi.log 2>&1
+
+Go to path opt/tomcat/logs, you should see the webapi.log file
+
+Open browser and go to site
+
+http://127.0.0.1:8080/manager
+
+Sign in with username "tomcat" and password "s3cret"
+
+Find the "WAR file to deploy" tab, and click browse to find your API,
+the path is in WebAPI/Target/WebAPI.war,
+and then click deploy
+
+
+Check deploy successfully:
+
+Go to file /opt/tomcat/logs/webapi.log
+Check if there any errors
+and also, you should see a line like
+org.ohdsi.webapi.WebApi -  - Started WebApi in xx.xxx seconds (JVM running for yy.yy)
+
+
+If all worked, you can verify that WebAPI is working by navigating to http://localhost:8080/WebAPI/info and you should see the following output:
+{"version":"2.10.1"}
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+To delete the webapi log file, kill tomcat and run following commands:
+
+sudo su
+
+rm /opt/tomcat/logs/webapi.log
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+BUild ATLAS
+
+RUn the following command lines:
+
+sudo apt install npm
+
+npm install -g npm
+
+##Check NodeJS and npm version
+
+npm -v
+node -v
+
+## As long as these two works, the installation has finished
+
+Now download ATLAS, follow the command below:
+
+cd
+
+git clone https://github.com/OHDSI/Atlas.git
+
+cd Atlas
+
+npm run build
+
+cd
+
+cp Atlas/js/config/app.js Atlas/js/config/config-local.js
+
+sudo nano Atlas/js/config/config-local.js
+
+##Change the part
+----------------------------------------------
+appConfig.api = {
+        name: 'Local',
+        url: 'http://localhost:8080/WebAPI/'
+    };
+----------------------------------------------
+
+to
+
+----------------------------------------------
+appConfig.api = {
+        name: 'Local',
+        url: 'http://127.0.0.1:8080/WebAPI/'
+    };
+----------------------------------------------
+
+sudo su
+
+sudo cp -r Atlas /opt/tomcat/webapps
+
+
+
+
+
+
+
+
+
+
+
+
+Configure CDM connect to the WebAPI
+
+Open pgAdmin4 application, open Servers -> postgres -> Databases -> OHDSI -> Schemas, right click Create -> Schema.
+
+Create four new schema,
+one is results, one is temp, one is cdm, and one is vocabulary
+
+open Servers -> postgres -> Databases -> Login/Group roles, right click, create -> login/group role,
+
+In Gnereal tab, set name as "webapi_sa", comments set as "A SQL account that is used by WebAPI to access the CDM and these various schemas"
+
+Save and exit
+
+Find Servers -> postgres -> Databases -> OHDSI -> Schemas
+Right click cdm, select "Default privileges" tab, select "Tables" tab, and then add Grantee as "webapi_sa", Privileges, "SELECT", save
+Right click vocabulary, select "Default privileges" tab, select "Tables" tab, and then add Grantee as "webapi_sa", Privileges, "SELECT", save
+Right click results, select "Default privileges" tab, select "Tables" tab, and then add Grantee as "webapi_sa", Privileges, "INSERT", "SELECT", "UPDATE", "DELETE", save
+Right click temp, select "Default privileges" tab, select "Tables" tab, and then add Grantee as "webapi_sa", Privileges, "ALL" (all checked), save
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Gnenerate synthea data
+
+Doload latest version synthea by clone, go to https://github.com/synthetichealth/synthea/releases
+
+Find v3.0.0 and download the "Source code (zip)" file
+
+FInd the downloaded file, unzip it, and now open termianl in the synthea folder, check synthea works, by runing following commands line by line
+
+./gradlew build check test
+
+-------------------------------
+
+You should see "BUILD SUCCESSFUL", means successfully
+
+Now, generate synthea data, by running 
+
+./run_synthea -p 1000 --exporter.csv.export=true
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+For other parameters, run_synthea [-s seed] [-p populationSize] [state [city]]
+see link https://github.com/synthetichealth/synthea
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+Go to website https://athena.ohdsi.org/search-terms/start
+
+Create a account and login
+
+Go to Download
+
+Click download vocabularies
+
+Create a name and download
+
+After waiting sometime, your download should be prepared, and then click download.
+
+Extract the vocabularies zip
+
+Go to website https://github.com/OHDSI/ETL-Synthea
+
+Open R studio and run the following scripts
+
+devtools::install_github("OHDSI/ETL-Synthea")
+
+library(ETLSyntheaBuilder)
+
+
+
+#  Open pgAdmin4 application, open Servers -> postgres -> Databases -> OHDSI -> Schemas, right click Create -> Schema.
+#  Create a new schema named cdm
+
+and then select all and run the script
+
+# change server   = "localhost/synthea10",  to server   = "localhost/yourDatabaseName", (in this note is server   = "localhost/OHDSI")
+# Change "d:/drivers" to your driver path
+# Change syntheaVersion <- "2.7.0" to syntheaVersion <- "3.0.0"
+# Change cdmSchema <- "cdm_synthea10" to cdmSchema <- "cdm"
+# Change syntheaFileLoc <- "/tmp/synthea/output/csv" to syntheaFileLoc <- "/YOUR_DOWNLOAD_PATH/synthea/output/csv"
+# Change vocabFileLoc   <- "/tmp/Vocabulary_20181119" to vocabFileLoc <- "/YOUR_DOWNLOAD_PATH/vocabulary"
+# Change password = "lillpop",  to your password (in this note is ohdsi)
+
+cd <- DatabaseConnector::createConnectionDetails(
+  dbms     = "postgresql", 
+  server   = "localhost/synthea10", 
+  user     = "postgres", 
+  password = "lollipop", 
+  port     = 5432, 
+  pathToDriver = "d:/drivers"
+)
+
+cdmSchema      <- "cdm_synthea10"
+cdmVersion     <- "5.3"
+syntheaVersion <- "3.0.0"
+syntheaSchema  <- "native"
+syntheaFileLoc <- "/tmp/synthea/output/csv"
+vocabFileLoc   <- "/tmp/Vocabulary_20181119"
+ 
+Then select all and run script.
+
+Now add this script under the the scipts below:
+ETLSyntheaBuilder::CreateCDMTables(connectionDetails = cd, cdmSchema = cdmSchema, cdmVersion = cdmVersion)
+
+Select all and Run
+
+Now, go to postgres 
+
+Find Servers -> postgres -> Databases -> OHDSI -> Schemas, drop cdm, and create cdm again
+
+save the code script, and create a new one.
+
+# Change server = "localhost/ohdsi", to your database name, in this note, is server = "localhost/OHDSI",
+# Change user = "postgres" to your username, in this note is "postgres"
+# Change password = "postgres" to your user password, in this note is password = "ohdsi"
+# Change pathToDriver = "/pathToDriver" as your driver path as previous
+# CHange cdmDatabaseSchema = "ohdsi_demo"to your cdm schema name, in this note, is cdmDatabaseSchema = "cdm"
+
+---------------------------------------------------------------------------------------------------
+cd <- DatabaseConnector::createConnectionDetails(dbms = "postgresql",
+                                                 server = "localhost/ohdsi",
+                                                 user = "postgres",
+                                                 password = "postgres",
+                                                 pathToDriver = "/pathToDriver"
+                                                 )
+
+CommonDataModel::executeDdl(connectionDetails = cd,
+                            cdmVersion = "5.3",
+                            cdmDatabaseSchema = "ohdsi_demo"
+                            )
+---------------------------------------------------------------------------------------------------
+
+Open the saved R script, and replace "ETLSyntheaBuilder::CreateCDMTables(connectionDetails = cd, cdmSchema = cdmSchema, cdmVersion = cdmVersion)"
+with
+"ETLSyntheaBuilder::CreateSyntheaTables(connectionDetails = cd, syntheaSchema = syntheaSchema, syntheaVersion = syntheaVersion)"
+Select all and run the script
+
+
+Now, replace "ETLSyntheaBuilder::CreateSyntheaTables(connectionDetails = cd, syntheaSchema = syntheaSchema, syntheaVersion = syntheaVersion)"
+with
+"ETLSyntheaBuilder::LoadSyntheaTables(connectionDetails = cd, syntheaSchema = syntheaSchema, syntheaFileLoc = syntheaFileLoc)"
+Select all and run the script
+
+Now, replace "ETLSyntheaBuilder::LoadSyntheaTables(connectionDetails = cd, syntheaSchema = syntheaSchema, syntheaFileLoc = syntheaFileLoc)"
+with
+"ETLSyntheaBuilder::LoadVocabFromCsv(connectionDetails = cd, cdmSchema = cdmSchema, vocabFileLoc = vocabFileLoc)"
+Select all and run the script
+!!!# If error, try drop cdm schema from pgadmin, and create a new schema called cdm, the run ETLSyntheaBuilder::CreateCDMTables(connectionDetails = cd, cdmSchema = cdmSchema, cdmVersion = cdmVersion) and then run this again
+
+
+
+
+
+Go to pgAdmin4, OHDSI -> Schema -> cdm -> tables -> device explosure.
+Select columns, change 'lenght/precision' of 'unique_device_id' from 50 too 100
+Select columns, change 'lenght/precision' of 'device_source_value' from 50 too 100
+
+Now, replace "ETLSyntheaBuilder::LoadVocabFromCsv(connectionDetails = cd, cdmSchema = cdmSchema, vocabFileLoc = vocabFileLoc)"
+with
+"ETLSyntheaBuilder::LoadEventTables(connectionDetails = cd, cdmSchema = cdmSchema, syntheaSchema = syntheaSchema, cdmVersion = cdmVersion, syntheaVersion = syntheaVersion)"
+Select all and run the script
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Configure CDM
+
+Go to website
+http://<server:port>/WebAPI/ddl/results?dialect=<your_cdm_database_dialect>&schema=<your_results_schema>&vocabSchema=<your_vocab_schema>&tempSchema=<your_temp_schema>&initConceptHierarchy=true
+
+Where:
+<your_cdm_database_dialect>: This is one of the following: oracle, postgresql, pdw, redshift, impala, netezza, bigquery, or sql server and is based on the platform you use to host your CDM.
+<your_results_schema>: The schema containing your results tables
+<your_vocab_schema>: The schema containing your vocabulary tables
+<your_temp_schema>: The schema that it utilized for your temporary schema
+The initConceptHierarchy value in the URL is set to true and is used to establish the concept_hierarchy which is a cached version of the OMOP vocabulary specific to the concepts found in your CDM.
+This table can take a while to build and only needs to be established one time. This value can be set to false if you do not need to re-establish this table.
+
+In this note, the website site should be:
+http://127.0.0.1:8080/WebAPI/ddl/results?dialect=postgresql&schema=results&vocabSchema=cdm&tempSchema=temp&initConceptHierarchy=true
+
+
+You should find a query script shown in the website, copy them all and go to pgadmin4, go to postgres -> Databases -> OHDSI, right click and select quert tool, paste and click run to execute the sql script.
+
+
+
+
+
+Same as previous,
+
+run the following script,
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+INSERT INTO webapi.source (source_id, source_name, source_key, source_connection, source_dialect) 
+SELECT nextval('webapi.source_sequence'), 'My Cdm', 'MY_CDM', ' jdbc:postgresql://server:5432/cdm?user={user}&password={password}', 'postgresql';
+
+INSERT INTO webapi.source_daimon (source_daimon_id, source_id, daimon_type, table_qualifier, priority) 
+SELECT nextval('webapi.source_daimon_sequence'), source_id, 0, 'cdm', 0
+FROM webapi.source
+WHERE source_key = 'MY_CDM'
+;
+
+INSERT INTO webapi.source_daimon (source_daimon_id, source_id, daimon_type, table_qualifier, priority) 
+SELECT nextval('webapi.source_daimon_sequence'), source_id, 1, 'vocab', 1
+FROM webapi.source
+WHERE source_key = 'MY_CDM'
+;
+
+INSERT INTO webapi.source_daimon (source_daimon_id, source_id, daimon_type, table_qualifier, priority) 
+SELECT nextval('webapi.source_daimon_sequence'), source_id, 2, 'results', 1
+FROM webapi.source
+WHERE source_key = 'MY_CDM'
+;
+
+INSERT INTO webapi.source_daimon (source_daimon_id, source_id, daimon_type, table_qualifier, priority) 
+SELECT nextval('webapi.source_daimon_sequence'), source_id, 5, 'temp', 0
+FROM webapi.source
+WHERE source_key = 'MY_CDM'
+;
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+And the fresh with opening the site
+
+<server>:port/WebAPI/source/refresh
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
