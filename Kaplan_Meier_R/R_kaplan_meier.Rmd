@@ -22,8 +22,8 @@ library(ggsurvfit)
 
 
 ```{r}
-data = read.csv(file = 'preprocessed_data_Tableau/two_drug.csv')
-names(data)[names(data) == 'medication'] <- 'group'
+data = read.csv(file = 'preprocessed_data/two_drug.csv')
+names(data)[names(data) == 'Medication'] <- 'group'
 data[order(data$group,data$Time),]
 # for kaplan Meier analysis, the standard format need with column
 #Time: time to events
@@ -99,7 +99,7 @@ get_kaplan_meier_plot1(data,time_unit)
 
 ```{r}
 
-data =  read.csv(file = 'preprocessed_data_Tableau/all_die_1_year.csv')
+data =  read.csv(file = 'preprocessed_data/all_die_1_year.csv')
 names(data)[names(data) == 'DESCRIPTION'] <- 'group'
 get_kaplan_meier_plot1(data,time_unit)
 
@@ -107,31 +107,41 @@ get_kaplan_meier_plot1(data,time_unit)
 
 
 ```{r}
-data =  read.csv(file = 'preprocessed_data_Tableau/all_alive.csv')
+data =  read.csv(file = 'preprocessed_data/all_alive.csv')
 names(data)[names(data) == 'DESCRIPTION'] <- 'group'
 get_kaplan_meier_plot1(data,time_unit)
 
 ```
 
 ```{r}
-data =  read.csv(file = 'preprocessed_data_Tableau/all_die_1_day.csv')
+data =  read.csv(file = 'preprocessed_data/all_die_1_day.csv')
 names(data)[names(data) == 'DESCRIPTION'] <- 'group'
 get_kaplan_meier_plot1(data,time_unit)
 ```
 
 ```{r}
-data =  read.csv(file = 'preprocessed_data_Tableau/all_die_prop_time.csv')
+data =  read.csv(file = 'preprocessed_data/all_die_prop_time.csv')
 names(data)[names(data) == 'DESCRIPTION'] <- 'group'
 get_kaplan_meier_plot1(data,time_unit)
 ```
 
 ```{r}
-data =  read.csv(file = 'preprocessed_data_Tableau/two_condition.csv')
+data =  read.csv(file = 'preprocessed_data/two_condition.csv')
+names(data)[names(data) == 'DESCRIPTION'] <- 'group'
+data
+get_kaplan_meier_plot1(data,time_unit)
+```
+
+```{r}
+data =  read.csv(file = 'preprocessed_data/half_die.csv')
 names(data)[names(data) == 'DESCRIPTION'] <- 'group'
 get_kaplan_meier_plot1(data,time_unit)
 ```
 
 
+```{r}
+data
+```
 
 # After getting the plot, we also interested in whether the two group statistical significant or not, hence we need to do the logrank test
 
