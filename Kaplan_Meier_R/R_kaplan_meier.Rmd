@@ -147,8 +147,8 @@ data
 
 ```{r}
 
-data = read.csv(file = 'preprocessed_data_Tableau/two_drug.csv')
-names(data)[names(data) == 'medication'] <- 'group'
+data = read.csv(file = 'preprocessed_data/two_drug.csv')
+names(data)[names(data) == 'Medication'] <- 'group'
 survdiff(Surv(Time, Status) ~ group, data=data)$pvalue
 ```
 
@@ -159,18 +159,19 @@ survdiff(Surv(Time, Status) ~ group, data=data)$pvalue
 
 # if there is one variable and is binary classes, we can find out the pvalue of the logranktest value is same as the Score(logrank) test in the summary of cox model
 ```{r}
-data = read.csv(file = 'preprocessed_data_Tableau/two_drug.csv')
-coxfit = coxph(Surv(Time, Status) ~ medication, data=data)
+data = read.csv(file = 'preprocessed_data/two_drug.csv')
+coxfit = coxph(Surv(Time, Status) ~ Medication, data=data)
 summary(coxfit)$sctest[3]
-survdiff(Surv(Time, Status) ~ medication , data=cox_info)$pvalue
+survdiff(Surv(Time, Status) ~ Medication , data=data)$pvalue
 ```
 
 
 # for multiple variable and with continuous variables
 
 ```{r}
-data = read.csv(file = 'preprocessed_data_Tableau/two_drug.csv')
-coxfit = coxph(Surv(Time, Status) ~ medication + age.cancer., data=data)
+data = read.csv(file = 'preprocessed_data/two_drug.csv')
+
+coxfit = coxph(Surv(Time, Status) ~ Medication + Age_cancer, data=data)
 summary(coxfit)
 
 ```
