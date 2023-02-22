@@ -16,6 +16,7 @@ library(ggplot2)
 library(ggfortify)
 library(plotly)
 library(ggsurvfit)
+library(stringr)
 ```
 
 # The first example is analysis the whether there is significant difference in two different drugs with conditions as cancer, the reading data is already extracted as the standard format used for survival analysis used for check the correctness of Kaplan Meier curve plot by Tableau
@@ -180,5 +181,4 @@ summary(coxfit)
 there is a 0.78668 unit decrease in expected log of the relative hazard for Paclitaxel 100 MG Injection as compared to 100 ML Epirubicin Hydrochloride 2 MG/ML Injection, holding other factor constant.
 
 there is a 0.02420 unit decrease in expected log of the relative hazard for unit increased in age, holding other factor constant.
-
 
